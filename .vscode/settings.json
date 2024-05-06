@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "*.h": "cpp",
+        "*.txt": "cmake",
+        "webrtc_log_0": "asn1",
+        "array": "cpp",
+        "future": "cpp",
+        "istream": "cpp",
+        "locale": "cpp",
+        "thread": "cpp",
+        "tuple": "cpp",
+        "variant": "cpp",
+        "__config": "cpp"
+    }
+}
