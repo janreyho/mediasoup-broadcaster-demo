@@ -37,6 +37,16 @@ class SquareGenerator : public FrameGeneratorInterface {
   void ChangeResolution(size_t width, size_t height) override;
   VideoFrameData NextFrame() override;
 
+  Resolution GetResolution() const override {
+    // 返回一个有效的 Resolution 对象
+    return {(size_t)width_, (size_t)height_};
+  }
+
+  absl::optional<int> fps() const override {
+    // 返回一个有效的帧率值
+    return 30; // 假设帧率是 30 fps
+  }
+
  private:
   rtc::scoped_refptr<I420Buffer> CreateI420Buffer(int width, int height);
 
@@ -75,7 +85,17 @@ class YuvFileGenerator : public FrameGeneratorInterface {
 
   VideoFrameData NextFrame() override;
   void ChangeResolution(size_t width, size_t height) override {
-    RTC_NOTREACHED();
+    RTC_DCHECK_NOTREACHED();
+  }
+
+  Resolution GetResolution() const override {
+    // 返回一个有效的 Resolution 对象
+    return {(size_t)width_, (size_t)height_};
+  }
+
+  absl::optional<int> fps() const override {
+    // 返回一个有效的帧率值
+    return 30; // 假设帧率是 30 fps
   }
 
  private:
@@ -104,7 +124,17 @@ class SlideGenerator : public FrameGeneratorInterface {
 
   VideoFrameData NextFrame() override;
   void ChangeResolution(size_t width, size_t height) override {
-    RTC_NOTREACHED();
+    RTC_DCHECK_NOTREACHED();
+  }
+
+  Resolution GetResolution() const override {
+    // 返回一个有效的 Resolution 对象
+    return {(size_t)width_, (size_t)height_};
+  }
+
+  absl::optional<int> fps() const override {
+    // 返回一个有效的帧率值
+    return 30; // 假设帧率是 30 fps
   }
 
  private:
@@ -134,7 +164,17 @@ class ScrollingImageFrameGenerator : public FrameGeneratorInterface {
 
   VideoFrameData NextFrame() override;
   void ChangeResolution(size_t width, size_t height) override {
-    RTC_NOTREACHED();
+    RTC_DCHECK_NOTREACHED();
+  }
+
+  Resolution GetResolution() const override {
+    // 返回一个有效的 Resolution 对象
+    return {(size_t)target_width_, (size_t)target_height_};
+  }
+
+  absl::optional<int> fps() const override {
+    // 返回一个有效的帧率值
+    return 30; // 假设帧率是 30 fps
   }
 
  private:

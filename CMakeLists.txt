@@ -7,7 +7,7 @@ set(broadcaster_VERSION_MAJOR 0)
 set(broadcaster_VERSION_MINOR 1)
 
 # C++ standard requirements.
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 message("\n=========== mediasoup-broadcaster-demo Build Configuration ===========\n")
