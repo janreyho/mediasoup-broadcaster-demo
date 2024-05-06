@@ -12,15 +12,14 @@
 
 #include <string.h>
 
-#include "rtc_base/checks.h"
-#include "api/location.h"
-#include "rtc_base/ref_counted_object.h"
-#include "api/units/time_delta.h"
 #include "api/make_ref_counted.h"
+#include "api/units/time_delta.h"
+#include "rtc_base/checks.h"
 #include "rtc_base/thread.h"
 #include "rtc_base/time_utils.h"
 
 using ::webrtc::TimeDelta;
+
 // Audio sample value that is high enough that it doesn't occur naturally when
 // frames are being faked. E.g. NetEq will not generate this large sample value
 // unless it has received an audio frame containing a sample of this value.
@@ -36,11 +35,6 @@ static const int kTotalDelayMs = 0;
 static const int kClockDriftMs = 0;
 static const uint32_t kMaxVolume = 14392;
 
-enum {
-  MSG_START_PROCESS,
-  MSG_RUN_PROCESS,
-};
-
 FakeAudioCaptureModule::FakeAudioCaptureModule()
     : audio_callback_(nullptr),
       recording_(false),
@@ -50,9 +44,7 @@ FakeAudioCaptureModule::FakeAudioCaptureModule()
       current_mic_level_(kMaxVolume),
       started_(false),
       next_frame_time_(0),
-      frames_received_(0) {
-  process_thread_checker_.Detach();
-}
+      frames_received_(0) {}
 
 FakeAudioCaptureModule::~FakeAudioCaptureModule() {
   if (process_thread_) {
@@ -388,21 +380,6 @@ int32_t FakeAudioCaptureModule::PlayoutDelay(uint16_t* delay_ms) const {
   *delay_ms = 0;
   return 0;
 }
-
-// void FakeAudioCaptureModule::OnMessage(rtc::Message* msg) {
-//   switch (msg->message_id) {
-//     case MSG_START_PROCESS:
-//       StartProcessP();
-//       break;
-//     case MSG_RUN_PROCESS:
-//       ProcessFrameP();
-//       break;
-//     default:
-//       // All existing messages should be caught. Getting here should never
-//       // happen.
-//       RTC_DCHECK_NOTREACHED();
-//   }
-// }
 
 bool FakeAudioCaptureModule::Initialize() {
   // Set the send buffer samples high enough that it would not occur on the

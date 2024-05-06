@@ -35,17 +35,10 @@ class IvfVideoFrameGenerator : public FrameGeneratorInterface {
 
   VideoFrameData NextFrame() override;
   void ChangeResolution(size_t width, size_t height) override;
+  Resolution GetResolution() const override;
 
-  Resolution GetResolution() const override {
-    // 返回一个有效的 Resolution 对象
-    return {(size_t)width_, (size_t)height_};
-  }
+  absl::optional<int> fps() const override { return absl::nullopt; }
 
-  absl::optional<int> fps() const override {
-    // 返回一个有效的帧率值
-    return 30; // 假设帧率是 30 fps
-  }
-  
  private:
   class DecodedCallback : public DecodedImageCallback {
    public:

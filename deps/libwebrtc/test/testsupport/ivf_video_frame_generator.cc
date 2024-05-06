@@ -16,6 +16,7 @@
 #include "api/video/i420_buffer.h"
 #include "api/video_codecs/video_codec.h"
 #include "media/base/media_constants.h"
+#include "modules/video_coding/codecs/av1/dav1d_decoder.h"
 #include "modules/video_coding/codecs/h264/include/h264.h"
 #include "modules/video_coding/codecs/vp8/include/vp8.h"
 #include "modules/video_coding/codecs/vp9/include/vp9.h"
@@ -104,6 +105,11 @@ void IvfVideoFrameGenerator::ChangeResolution(size_t width, size_t height) {
   height_ = height;
 }
 
+FrameGeneratorInterface::Resolution IvfVideoFrameGenerator::GetResolution()
+    const {
+  return {.width = width_, .height = height_};
+}
+
 int32_t IvfVideoFrameGenerator::DecodedCallback::Decoded(
     VideoFrame& decoded_image) {
   Decoded(decoded_image, 0, 0);
@@ -138,6 +144,12 @@ std::unique_ptr<VideoDecoder> IvfVideoFrameGenerator::CreateVideoDecoder(
   }
   if (codec_type == VideoCodecType::kVideoCodecH264) {
     return H264Decoder::Create();
+  }
+  if (codec_type == VideoCodecType::kVideoCodecAV1) {
+    return CreateDav1dDecoder();
+  }
+  if (codec_type == VideoCodecType::kVideoCodecH265) {
+    // TODO(bugs.webrtc.org/13485): implement H265 decoder
   }
   return nullptr;
 }
