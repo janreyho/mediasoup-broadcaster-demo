@@ -7,6 +7,7 @@
 #include "pc/test/fake_audio_capture_module.h"
 #include "pc/test/fake_periodic_video_track_source.h"
 #include "pc/test/frame_generator_capturer_video_track_source.h"
+#include "pc/test/fake_video_track_source.h"
 #include "system_wrappers/include/clock.h"
 #include "api/audio_codecs/builtin_audio_decoder_factory.h"
 #include "api/audio_codecs/builtin_audio_encoder_factory.h"
@@ -34,21 +35,23 @@ static rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> factory;
 /* MediaStreamTrack holds reference to the threads of the PeerConnectionFactory.
  * Use plain pointers in order to avoid threads being destructed before tracks.
  */
-static rtc::Thread* networkThread;
-static rtc::Thread* signalingThread;
-static rtc::Thread* workerThread;
+// static rtc::Thread* networkThread;
+// static rtc::Thread* signalingThread;
+  std::unique_ptr<rtc::Thread> signalingThread;
+// static rtc::Thread* workerThread;
 
 static void createFactory()
 {
-	networkThread   = rtc::Thread::Create().release();
-	signalingThread = rtc::Thread::Create().release();
-	workerThread    = rtc::Thread::Create().release();
+	// networkThread   = rtc::Thread::Create().release();
+	signalingThread = rtc::Thread::CreateWithSocketServer();
+	// workerThread    = rtc::Thread::Create().release();
 
-	networkThread->SetName("network_thread", nullptr);
+	// networkThread->SetName("network_thread", nullptr);
 	signalingThread->SetName("signaling_thread", nullptr);
-	workerThread->SetName("worker_thread", nullptr);
+	// workerThread->SetName("worker_thread", nullptr);
 
-	if (!networkThread->Start() || !signalingThread->Start() || !workerThread->Start())
+	// if (!networkThread->Start() || !signalingThread->Start() || !workerThread->Start())
+	if(!signalingThread->Start())
 	{
 		MSC_THROW_INVALID_STATE_ERROR("thread start errored");
 	}
@@ -62,9 +65,9 @@ static void createFactory()
 	}
 
 	factory = webrtc::CreatePeerConnectionFactory(
-	  networkThread,
-	  workerThread,
-	  signalingThread,
+	  nullptr,
+	  nullptr,
+	  signalingThread.get(),
 	  fakeAudioCaptureModule,
 	  webrtc::CreateBuiltinAudioEncoderFactory(),
 	  webrtc::CreateBuiltinAudioDecoderFactory(),
@@ -80,8 +83,6 @@ static void createFactory()
           webrtc::LibvpxVp9DecoderTemplateAdapter,
           webrtc::OpenH264DecoderTemplateAdapter,
           webrtc::Dav1dDecoderTemplateAdapter>>(),
-	// nullptr,
-	// nullptr,
 	  nullptr /*audio_mixer*/,
 	  nullptr /*audio_processing*/);
 
@@ -123,10 +124,11 @@ rtc::scoped_refptr<webrtc::VideoTrackInterface> createSquaresVideoTrack(const st
 		createFactory();
 
 	std::cout << "[INFO] getting frame generator" << std::endl;
-	auto* videoTrackSource = new rtc::RefCountedObject<webrtc::FrameGeneratorCapturerVideoTrackSource>(
+	auto videoTrackSource = rtc::make_ref_counted<webrtc::FrameGeneratorCapturerVideoTrackSource>(
 	  webrtc::FrameGeneratorCapturerVideoTrackSource::Config(), webrtc::Clock::GetRealTimeClock(), false);
-	videoTrackSource->Start();
+	// videoTrackSource->Start();
 
 	std::cout << "[INFO] creating video track" << std::endl;
-	return factory->CreateVideoTrack(rtc::CreateRandomUuid(), videoTrackSource);
+	return factory->CreateVideoTrack(videoTrackSource, rtc::CreateRandomUuid());
+	// return factory->CreateVideoTrack(webrtc::FakeVideoTrackSource::Create(), rtc::CreateRandomUuid());
 }
