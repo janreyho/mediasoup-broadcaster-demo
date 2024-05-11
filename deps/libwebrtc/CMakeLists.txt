@@ -10,6 +10,15 @@ set(SOURCE_FILES
 	test/testsupport/ivf_video_frame_generator.cc
 	test/testsupport/file_utils.cc
 	test/testsupport/file_utils_override.cc
+	
+	test/test_video_capturer.cc 
+	test/video_renderer.cc 
+	test/mac/run_test.mm 
+	test/mac/video_renderer_mac.mm 
+	test/gl/gl_renderer.cc 
+	test/platform_video_capturer.cc 
+	test/mac_capturer.mm
+	video/video_quality_test.cc
 )
 
 if(APPLE)
@@ -23,7 +32,12 @@ endif(APPLE)
 add_library(webrtc_broadcaster STATIC ${SOURCE_FILES})
 
 # Private (implementation) header files.
-target_include_directories(webrtc_broadcaster PRIVATE ${PROJECT_SOURCE_DIR}/deps/libwebrtc)
+target_include_directories(webrtc_broadcaster PRIVATE 
+	${PROJECT_SOURCE_DIR}/deps/libwebrtc
+	"/Users/hejiayi/Desktop/8_haoxinyun/gitlab/hxrtc/hxrtc/src/sdk/objc/base/"
+	"/Users/hejiayi/Desktop/8_haoxinyun/gitlab/hxrtc/hxrtc/src/sdk/objc/"
+	"/Users/hejiayi/Desktop/8_haoxinyun/gitlab/hxrtc/hxrtc/src/third_party/googletest/src/googletest/include"
+)
 
 # Public (interface) headers from dependencies.
 target_include_directories(webrtc_broadcaster PUBLIC
