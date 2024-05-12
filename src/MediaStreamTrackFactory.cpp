@@ -82,8 +82,22 @@
 #include "test/field_trial.h"
 #include "test/gtest.h"
 #include "test/run_test.h"
-
+#include "pc/video_track_source.h"
 #include "video/video_quality_test.h"
+
+
+#include "api/task_queue/default_task_queue_factory.h"
+#include "api/task_queue/task_queue_factory.h"
+#include "api/test/create_frame_generator.h"
+#include "pc/video_track_source.h"
+#include "test/frame_generator_capturer.h"
+
+#include "modules/video_capture/video_capture_factory.h"
+#if defined(WEBRTC_MAC)
+#include "test/mac_capturer.h"
+#else
+#include "test/vcm_capturer.h"
+#endif
 
 
 using namespace mediasoupclient;
@@ -176,25 +190,87 @@ rtc::scoped_refptr<webrtc::VideoTrackInterface> createVideoTrack(const std::stri
 	return factory->CreateVideoTrack(rtc::CreateRandomUuid(), videoTrackSource);
 }
 
+class CapturerTrackSource : public webrtc::VideoTrackSource {
+ public:
+  static rtc::scoped_refptr<CapturerTrackSource> Create() {
+    const size_t kWidth = 640;
+    const size_t kHeight = 480;
+    const size_t kFps = 30;
+    std::unique_ptr<webrtc::test::MacCapturer> capturer;
+    std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> info(
+        webrtc::VideoCaptureFactory::CreateDeviceInfo());   // 获取所有的视频捕获设备的信息
+    if (!info) {
+      return nullptr;
+    }
+    int num_devices = info->NumberOfDevices();
+    for (int i = 0; i < num_devices; ++i) {
+      capturer = absl::WrapUnique(                          // 创建一个VcmCapturer， VcmCapturer 继承了VideoSinkInterface
+          webrtc::test::MacCapturer::Create(kWidth, kHeight, kFps, i));
+      if (capturer) {
+        return rtc::make_ref_counted<CapturerTrackSource>(std::move(capturer));  // // 使用 VcmCapturer 创建一个CapturerTrackSource
+      }
+    }
+
+    return nullptr;
+  }
+
+ protected:
+  explicit CapturerTrackSource(
+      std::unique_ptr<webrtc::test::MacCapturer> capturer)
+      : VideoTrackSource(/*remote=*/false), capturer_(std::move(capturer)) {}
+
+ private:
+  rtc::VideoSourceInterface<webrtc::VideoFrame>* source() override {    // 提供源
+    return capturer_.get();
+  }
+  std::unique_ptr<webrtc::test::MacCapturer> capturer_;
+};
+
 
 
 namespace webrtc {
+
+std::unique_ptr<test::TestVideoCapturer> hjy_video_capture;
+rtc::scoped_refptr<CapturerTrackSource>  video_device;
+rtc::scoped_refptr<webrtc::VideoTrackInterface> video_track_;
 void Loopback() {     // 可以采集渲染成功
     RTC_LOG(LS_INFO) << __FUNCTION__;
 
-    std::unique_ptr<test::TestVideoCapturer> hjy_video_capture = test::CreateVideoCapturer(640, 480, 15, 0);
-    std::unique_ptr<test::VideoRenderer> hjy_local_preview;
+    hjy_video_capture = test::CreateVideoCapturer(640, 480, 15, 0);
+	// video_track_ = factory->CreateVideoTrack(hjy_video_capture, "hejiayi"));
 
-    hjy_local_preview.reset(test::VideoRenderer::Create( "Local Preview", 640, 480));
+	std::unique_ptr<webrtc::test::MacCapturer> capturer = absl::WrapUnique(webrtc::test::MacCapturer::Create(640, 480, 15, 0));
+	video_device = rtc::make_ref_counted<CapturerTrackSource>(std::move(capturer));
+	// video_track_ = factory->CreateVideoTrack(video_device, "hejiayi");
 
-    hjy_video_capture->AddOrUpdateSink(hjy_local_preview.get(),     // 用于添加或更新一个视频接收器
-                                           rtc::VideoSinkWants());  // 指定视频接收器希望的（例如，帧的分辨率、帧率等）
+	// 渲染
+    // std::unique_ptr<test::VideoRenderer> hjy_local_preview;
+    // hjy_local_preview.reset(test::VideoRenderer::Create( "Local Preview", 640, 480));
+    // hjy_video_capture->AddOrUpdateSink(hjy_local_preview.get(),     // 用于添加或更新一个视频接收器
+    //                                        rtc::VideoSinkWants());  // 指定视频接收器希望的（例如，帧的分辨率、帧率等）
 	
+	// puts(">> Press ENTER to continue...");
+    // while (getc(stdin) != '\n' && !feof(stdin))
+    //     ;  // NOLINT
+}
+
+void Conductor(){
+	video_device =  CapturerTrackSource::Create();
+	video_track_ = factory->CreateVideoTrack(video_device, "hejiayi");
+
+	std::unique_ptr<test::VideoRenderer> hjy_local_preview;
+    hjy_local_preview.reset(test::VideoRenderer::Create( "Local Preview", 640, 480));
+	// hjy_local_preview.reset(new test::VideoRenderer(handle(), 1, 1, video_track_.get()));
+    video_device->AddOrUpdateSink(hjy_local_preview.get(), rtc::VideoSinkWants());
+
 	puts(">> Press ENTER to continue...");
     while (getc(stdin) != '\n' && !feof(stdin))
         ;  // NOLINT
 }
+
 }
+
+
 
 
 rtc::scoped_refptr<webrtc::VideoTrackInterface> createSquaresVideoTrack(const std::string& /*label*/)
@@ -207,9 +283,11 @@ rtc::scoped_refptr<webrtc::VideoTrackInterface> createSquaresVideoTrack(const st
 	  webrtc::FrameGeneratorCapturerVideoTrackSource::Config(), webrtc::Clock::GetRealTimeClock(), false);
 	// videoTrackSource->Start();
 
-	webrtc::test::RunTest(webrtc::Loopback);
+	webrtc::test::RunTest(webrtc::Loopback);	// 成功采集并发布到mediasoup demo
+	// webrtc::test::RunTest(webrtc::Conductor);
+
 
 	std::cout << "[INFO] creating video track" << std::endl;
-	return factory->CreateVideoTrack(videoTrackSource, rtc::CreateRandomUuid());
+	return factory->CreateVideoTrack(webrtc::video_device, rtc::CreateRandomUuid());
 	// return factory->CreateVideoTrack(webrtc::FakeVideoTrackSource::Create(), rtc::CreateRandomUuid());
 }

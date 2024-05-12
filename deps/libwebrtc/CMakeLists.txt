@@ -11,6 +11,7 @@ set(SOURCE_FILES
 	test/testsupport/file_utils.cc
 	test/testsupport/file_utils_override.cc
 	
+	test/vcm_capturer.cc 
 	test/test_video_capturer.cc 
 	test/video_renderer.cc 
 	test/mac/run_test.mm 
