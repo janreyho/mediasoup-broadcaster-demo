@@ -1,0 +1,6 @@
+[submodule "deps/cpr"]
+	path = deps/cpr
+	url = git@github.com:janreyho/cpr.git
+[submodule "deps/libmediasoupclient"]
+	path = deps/libmediasoupclient
+	url = git@github.com:janreyho/libmediasoupclient.git

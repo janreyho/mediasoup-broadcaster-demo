@@ -86,21 +86,21 @@ endif(APPLE)
 
 include(FetchContent)
 
-message(STATUS "\nFetching mediasoupclient...\n")
-FetchContent_Declare(
-  mediasoupclient
-  GIT_REPOSITORY git@github.com:janreyho/libmediasoupclient.git
-  GIT_TAG m120
-)
-FetchContent_MakeAvailable(mediasoupclient)
+# message(STATUS "\nFetching mediasoupclient...\n")
+# FetchContent_Declare(
+#   mediasoupclient
+#   GIT_REPOSITORY git@github.com:janreyho/libmediasoupclient.git
+#   GIT_TAG m120
+# )
+# FetchContent_MakeAvailable(mediasoupclient)
 
-message(STATUS "Fetching cpr...\n")
-FetchContent_Declare(
-	cpr
-	GIT_REPOSITORY https://github.com/whoshuu/cpr
-	GIT_TAG 1.4.0
-)
-FetchContent_MakeAvailable(cpr)
+# message(STATUS "Fetching cpr...\n")
+# FetchContent_Declare(
+# 	cpr
+# 	GIT_REPOSITORY https://github.com/whoshuu/cpr
+# 	GIT_TAG 1.4.0
+# )
+# FetchContent_MakeAvailable(cpr)
 
 file(GLOB WebrtcSDK
   /Users/hejiayi/Desktop/8_haoxinyun/gitlab/hxrtc/hxrtc/src/out/mac/WebRTC.framework
@@ -161,6 +161,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include
 
 # Source Dependencies.
 add_subdirectory(deps/libwebrtc "${CMAKE_CURRENT_BINARY_DIR}/libwebrtc")
+add_subdirectory(deps/libmediasoupclient "${CMAKE_CURRENT_BINARY_DIR}/libmediasoupclient")
+add_subdirectory(deps/cpr "${CMAKE_CURRENT_BINARY_DIR}/cpr")
 
 # Public (interface) headers from dependencies.
 target_include_directories(${PROJECT_NAME} PUBLIC
