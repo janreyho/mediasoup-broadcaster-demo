@@ -34,10 +34,10 @@ add_library(webrtc_broadcaster STATIC ${SOURCE_FILES})
 
 # Private (implementation) header files.
 target_include_directories(webrtc_broadcaster PRIVATE 
-	${PROJECT_SOURCE_DIR}/deps/libwebrtc
-	"/Users/hejiayi/Desktop/8_haoxinyun/gitlab/hxrtc/hxrtc/src/sdk/objc/base/"
-	"/Users/hejiayi/Desktop/8_haoxinyun/gitlab/hxrtc/hxrtc/src/sdk/objc/"
-	"/Users/hejiayi/Desktop/8_haoxinyun/gitlab/hxrtc/hxrtc/src/third_party/googletest/src/googletest/include"
+	${PROJECT_SOURCE_DIR}/sdk/libwebrtc
+	${LIBWEBRTC_INCLUDE_PATH}/sdk/objc/base/
+	${LIBWEBRTC_INCLUDE_PATH}/sdk/objc/
+	${LIBWEBRTC_INCLUDE_PATH}/third_party/googletest/src/googletest/include
 )
 
 # Public (interface) headers from dependencies.

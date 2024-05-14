@@ -1,6 +1,6 @@
 [submodule "deps/cpr"]
-	path = deps/cpr
+	path = sdk/cpr
 	url = git@github.com:janreyho/cpr.git
 [submodule "deps/libmediasoupclient"]
-	path = deps/libmediasoupclient
+	path = sdk/libmediasoupclient
 	url = git@github.com:janreyho/libmediasoupclient.git
