@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(macDemo LANGUAGES CXX)
+project(hxSDK LANGUAGES CXX)
 
 if(WIN32)
     add_definitions(-DWEBRTC_WIN)
@@ -11,8 +11,8 @@ elseif(UNIX)
 endif()
 
 # Set version number.
-set(macDemo_VERSION_MAJOR 0)
-set(macDemo_VERSION_MINOR 1)
+set(hxSDK_VERSION_MAJOR 0)
+set(hxSDK_VERSION_MINOR 1)
 
 # C++ standard requirements.
 set(CMAKE_CXX_STANDARD 17)
@@ -30,9 +30,6 @@ set(CMAKE_USE_OPENSSL ON)
 # Add some compile flags to our source files.
 set_source_files_properties(${SOURCE_FILES}
 	PROPERTIES COMPILE_FLAGS -Wall -Wextra -Wpedantic)
-
-# Create target.
-add_executable(${PROJECT_NAME} ${SOURCES})
 
 # 添加 apple 相关 framework
 find_library(APPKIT_FRAMEWORK AppKit)
@@ -57,48 +54,8 @@ if(APPLE)
 	find_library(CORE_MEDIA CoreMedia)
 	find_library(CORE_VIDEO CoreVideo)
 	find_library(CORE_SERVICES CoreServices)
-
-	target_link_libraries(${PROJECT_NAME} PUBLIC
-		${APPLICATION_SERVICES}
-		${AUDIO_TOOLBOX}
-		${AV_FOUNDATION}
-		${CORE_AUDIO}
-		${CORE_FOUNDATION}
-		${CORE_MEDIA}
-		${CORE_VIDEO}
-		${CORE_SERVICES}
-
-		${APPKIT_FRAMEWORK} 
-		${CORE_MEDIA_FRAMEWORK} 
-		${VIDEO_TOOLBOX_FRAMEWORK}
-		${QUARTZ_CORE_LIBRARY}
-		${ICUCORE_LIBRARY}
-		${METAL_LIBRARY} 
-		${METALKIT_LIBRARY} 
-		${SECURITY_LIBRARY}
-		${AUDIO_UNIT_LIBRARY}
-		${OPENGL_LIBRARIES}
-
-	)
 endif(APPLE)
 
-include(FetchContent)
-
-# message(STATUS "\nFetching mediasoupclient...\n")
-# FetchContent_Declare(
-#   mediasoupclient
-#   GIT_REPOSITORY git@github.com:janreyho/libmediasoupclient.git
-#   GIT_TAG m120
-# )
-# FetchContent_MakeAvailable(mediasoupclient)
-
-# message(STATUS "Fetching cpr...\n")
-# FetchContent_Declare(
-# 	cpr
-# 	GIT_REPOSITORY https://github.com/whoshuu/cpr
-# 	GIT_TAG 1.4.0
-# )
-# FetchContent_MakeAvailable(cpr)
 
 file(GLOB WebrtcSDK
   ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/WebRTC.framework
@@ -148,27 +105,13 @@ set(WebrtcSDK ${WebrtcSDK} CACHE INTERNAL "List of WebRTC SDK Libraries")
 find_library(WEBRTC_LIB NAMES webrtc PATHS "${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj" NO_DEFAULT_PATH)
 file(GLOB RTC_BASE_LIBS "${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/rtc_base/*.a") # 遍历 rtc_base 所有库文件
 
-target_sources(${PROJECT_NAME} PRIVATE
-	demo/mac/src/Broadcaster.cpp
-	demo/mac/src/main.cpp
-	demo/mac/src/MediaStreamTrackFactory.cpp
-)
 
-# Private (implementation) header files.
-target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/demo/mac/include)
 
 # Source Dependencies.
 add_subdirectory(sdk/libwebrtc "${CMAKE_CURRENT_BINARY_DIR}/libwebrtc")
 add_subdirectory(sdk/libmediasoupclient "${CMAKE_CURRENT_BINARY_DIR}/libmediasoupclient")
 add_subdirectory(sdk/cpr "${CMAKE_CURRENT_BINARY_DIR}/cpr")
 
-# Public (interface) headers from dependencies.
-target_include_directories(${PROJECT_NAME} PUBLIC
-	${mediasoupclient_SOURCE_DIR}/include
-	${cpr_SOURCE_DIR}/include
-	"${PROJECT_SOURCE_DIR}/sdk/libwebrtc"
-	"${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/sdk/objc/base/"
-)
 
 # WebRTC 头文件路径
 include_directories("${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/sdk/objc/base/")
@@ -178,15 +121,6 @@ include_directories("${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/sdk/objc/")
 include_directories("${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/sdk/objc/base")
 include_directories("${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/")
 include_directories("${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/googletest/src/googletest/include")
-# Public (interface) dependencies.
-target_link_libraries(${PROJECT_NAME} PUBLIC
-	${LIBWEBRTC_BINARY_PATH}/libwebrtc${CMAKE_STATIC_LIBRARY_SUFFIX}
-	${WebrtcSDK}
 
-	${RTC_BASE_LIBS}
-	${WEBRTC_LIB}
-	cpr
-	mediasoupclient
-	webrtc_broadcaster
-)
 
+add_subdirectory(demo/mac)
