@@ -77,7 +77,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 # Private (implementation) header files.
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
-
+include_directories("${LIBWEBRTC_INCLUDE_PATH}/third_party/abseil-cpp/")
 # Source Dependencies.
 add_subdirectory(deps/libwebrtc "${CMAKE_CURRENT_BINARY_DIR}/libwebrtc")
 
@@ -85,7 +85,7 @@ add_subdirectory(deps/libwebrtc "${CMAKE_CURRENT_BINARY_DIR}/libwebrtc")
 target_include_directories(${PROJECT_NAME} PUBLIC
 	${mediasoupclient_SOURCE_DIR}/include
 	${cpr_SOURCE_DIR}/include
-	"${PROJECT_SOURCE_DIR}/deps/libwebrtc"
+	${PROJECT_SOURCE_DIR}/deps/libwebrtc
 )
 
 # Public (interface) dependencies.
@@ -94,5 +94,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	cpr
 	mediasoupclient
 	webrtc_broadcaster
+	-lstdc++
+	# -lc++
 )
 
