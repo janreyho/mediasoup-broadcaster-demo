@@ -3,4 +3,4 @@
 	url = git@github.com:janreyho/cpr.git
 [submodule "deps/libmediasoupclient"]
 	path = sdk/libmediasoupclient
-	url = git@github.com:janreyho/libmediasoupclient.git
+	url = git@github.com:janreyho/hxmediasoupclient.git
