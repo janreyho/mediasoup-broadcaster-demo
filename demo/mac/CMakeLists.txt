@@ -30,6 +30,11 @@ elseif(UNIX)
 		${hxrtc_src}/test/linux/video_renderer_linux.cc
 		${hxrtc_src}/test/linux/glx_renderer.cc
 		${hxrtc_src}/test/run_test.cc
+		${hxrtc_src}/stats/rtc_stats_report.cc
+		${hxrtc_src}/stats/rtc_stats.cc
+		${hxrtc_src}/common_video/video_frame_buffer.cc
+		${hxrtc_src}/rtc_base/task_queue.cc
+		${hxrtc_src}/api/units/time_delta.cc
 
 		${hxrtc_src}/api/rtp_parameters.cc
 	    ${hxrtc_src}/api/jsep.cc
@@ -73,6 +78,7 @@ elseif(UNIX)
 	    ${hxrtc_src}/pc/simulcast_description.cc
 	    ${hxrtc_src}/pc/media_protocol_names.cc
 	    ${hxrtc_src}/media/base/rid_description.cc
+		${hxrtc_src}/media/base/sdp_video_format_utils.cc
 	    ${hxrtc_src}/modules/rtp_rtcp/include/rtp_rtcp_defines.cc
 	
 	    ${hxrtc_src}/media/base/stream_params.cc
@@ -151,6 +157,7 @@ elseif(UNIX)
 		-lX11        # X11 库（GLX 依赖 X11）
 		${GLIB_LIBRARIES}
 		${GTK3_LIBRARIES}
+		# ${hxrtc_obj}/stats/librtc_stats.a  # 不生效?
 		resolv
 		pthread
 		cpr
