@@ -12,6 +12,18 @@ elseif(UNIX)
     set(OPENSSL_INCLUDE_DIR "/usr/include/openssl")
 endif()
 
+if(WIN32)
+    set(lib_obj ".obj")
+    set(lib_lib ".lib")
+    set(lib_webrtc "webrtc.lib")
+    set(GN_COMMAND "--ide=vs2022 --args=\"${gn_args}\"")
+else()
+    set(lib_obj ".o")
+    set(lib_lib ".a")
+    set(lib_webrtc "libwebrtc.a")
+    set(GN_COMMAND "--args=\"${gn_args}\"")
+endif()
+
 # Set version number.
 set(hxSDK_VERSION_MAJOR 0)
 set(hxSDK_VERSION_MINOR 1)
@@ -57,46 +69,77 @@ if(APPLE)
 	find_library(CORE_SERVICES CoreServices)
 endif(APPLE)
 
+set(hxrtc_src ${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src)
+set(hxrtc_obj ${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj)
+# 生成一个查找库的脚本
+file(WRITE ${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs1.cmake "
+    # find_library(WEBRTC_LIB NAMES webrtc PATHS "${hxrtc_obj}" NO_DEFAULT_PATH)
+    file(GLOB WEBRTC_LIB \"${hxrtc_obj}/${lib_webrtc}\")
+    if(WEBRTC_LIB)
+        message(STATUS \"Found WEBRTC_LIB library: ${WEBRTC_LIB}\")
+    endif()
 
-file(GLOB WebrtcSDK
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/WebRTC.framework
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideoframebuffer_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideocapture_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideocodec_objc.a
-  # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libbase_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libnative_api.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libnative_video.a
+    file(GLOB BORINGSSL_LIB \"${hxrtc_obj}/third_party/boringssl/libboringssl${lib_lib}\")
+    if(BORINGSSL_LIB)
+        message(STATUS \"Found BORINGSSL_LIB library: ${BORINGSSL_LIB}\")
+    endif()
+")
 
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libdefault_codec_factory_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libaom_av1_encoder.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvp8.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvp9.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libfile_logger_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libmediasource_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libdav1d_decoder.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/modules/video_coding/codecs/av1/libdav1d_decoder.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideotoolbox_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideorendereradapter_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideosource_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libwrapped_native_codec_objc.a
+# 创建一个 CMake 脚本，用于查找已编译的库
+file(WRITE ${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs2.cmake "
+    file(GLOB RTC_BASE_LIBS \"${hxrtc_obj}/rtc_base/*${lib_lib}\")
+    if(RTC_BASE_LIBS)
+        message(STATUS \"RTC_BASE_LIBS library: \${RTC_BASE_LIBS}\")
+        set(RTC_BASE_LIBS \${RTC_BASE_LIBS} PARENT_SCOPE)
+    endif()
 
-  # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libhelpers_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libmediaconstraints_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libaudio_device_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libbase_native_additions_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libcallback_logger_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libmedia_constraints.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libobjc_audio_device_module.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideo_toolbox_cc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvpx_codec_constants.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libmetal_objc.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libpeerconnectionfactory_base_objc.a
-  # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/rtc_base/liblogging.a
-  # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/rtc_base/liblog_sinks.a
-
-  # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/audio/libaudio.a
-  ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/api/librtc_event_log_output_file.a
-  # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/rtc_base/libfile_rotating_stream.a
+    file(GLOB WebrtcSDK
+    \"${hxrtc_obj}/sdk/libvideoframebuffer_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libvideocapture_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libvideocodec_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libnative_api${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libnative_video${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libdefault_codec_factory_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libaom_av1_encoder${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libvp8${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libvp9${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libfile_logger_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libmediasource_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libdav1d_decoder${lib_lib}\"
+    \"${hxrtc_obj}/modules/video_coding/codecs/av1/libdav1d_decoder${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libvideotoolbox_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libvideorendereradapter_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libvideosource_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libwrapped_native_codec_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libmediaconstraints_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libaudio_device_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libbase_native_additions_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libcallback_logger_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libmedia_constraints${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libobjc_audio_device_module${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libvideo_toolbox_cc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libvpx_codec_constants${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libmetal_objc${lib_lib}\"
+    \"${hxrtc_obj}/sdk/libpeerconnectionfactory_base_objc${lib_lib}\"
+    \"${hxrtc_obj}/api/librtc_event_log_output_file${lib_lib}\"
+    )
+    # 使变量在整个项目中可用
+    if(WebrtcSDK)
+        set(WebrtcSDK \${WebrtcSDK} CACHE INTERNAL \"List of WebRTC SDK Libraries\")
+    endif()
+  ")
+# 添加一个目标来执行查找库文件的脚本
+add_custom_target(
+    find_webrtc_libs2 ALL
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs2.cmake
+    # DEPENDS build_webrtc
+    COMMENT "Finding WebRTC libraries"
+)
+add_custom_target(
+    find_webrtc_libs1 ALL
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs1.cmake
+    # DEPENDS build_webrtc
+    COMMENT "Finding WebRTC libraries"
 )
 
 # 使变量在整个项目中可用
