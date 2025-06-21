@@ -30,6 +30,7 @@ class MacRenderer : public GlRenderer {
 
   // Implements GlRenderer.
   void OnFrame(const VideoFrame& frame) override;
+  void StopRendering(); // 正确声明StopRendering方法
 
  private:
   CocoaWindow* window_;

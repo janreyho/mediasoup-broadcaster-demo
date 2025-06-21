@@ -16,6 +16,7 @@ namespace test {
 
 class NullRenderer : public VideoRenderer {
   void OnFrame(const VideoFrame& video_frame) override {}
+  // void StopRendering() override {} 
 };
 
 VideoRenderer* VideoRenderer::Create(const char* window_title,
@@ -27,5 +28,10 @@ VideoRenderer* VideoRenderer::Create(const char* window_title,
 
   return new NullRenderer();
 }
+
+// void VideoRenderer::StopRendering(){
+//     this->StopRendering();
+// }
+
 }  // namespace test
 }  // namespace webrtc

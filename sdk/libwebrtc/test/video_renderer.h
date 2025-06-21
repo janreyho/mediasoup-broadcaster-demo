@@ -34,6 +34,8 @@ class VideoRenderer : public rtc::VideoSinkInterface<VideoFrame> {
                                                size_t width,
                                                size_t height);
   virtual ~VideoRenderer() {}
+  // // Pure virtual method to stop rendering.
+  // virtual void StopRendering() = 0;
 
  protected:
   VideoRenderer() {}

@@ -8,26 +8,39 @@ set(SOURCE_FILES
 	test/frame_utils.cc
 	test/test_video_capturer.cc
 	test/testsupport/ivf_video_frame_generator.cc
-	test/testsupport/file_utils.cc
+	# test/testsupport/file_utils.cc
 	test/testsupport/file_utils_override.cc
 	
 	test/vcm_capturer.cc 
 	test/test_video_capturer.cc 
 	test/video_renderer.cc 
-	test/mac/run_test.mm 
-	test/mac/video_renderer_mac.mm 
 	test/gl/gl_renderer.cc 
 	test/platform_video_capturer.cc 
-	test/mac_capturer.mm
 	video/video_quality_test.cc
+	audio/audio_state.cc
 )
 
+
 if(APPLE)
-	set(SOURCE_FILES ${SOURCE_FILES}
+		set(SOURCE_FILES ${SOURCE_FILES}
 		test/testsupport/ios_file_utils.mm
 		test/testsupport/mac_file_utils.mm
-	)
-endif(APPLE)
+        test/mac/hx_runder.mm
+		test/mac/run_test.mm
+        test/mac/video_renderer_mac.mm
+        test/mac_capturer.mm
+    )
+elseif(WIN32)
+    list(APPEND SOURCE_FILES
+        # 添加Windows特定的源文件
+        test/windows/some_windows_file.cc
+    )
+elseif(UNIX)
+    list(APPEND SOURCE_FILES
+        # 添加Linux特定的源文件
+        # test/linux/some_linux_file.cc
+    )
+endif()
 
 # Create target.
 add_library(webrtc_broadcaster STATIC ${SOURCE_FILES})

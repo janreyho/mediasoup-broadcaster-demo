@@ -27,6 +27,7 @@
 // 'createWindow' must be called on the main thread.
 - (void)createWindow:(NSObject *)ignored;
 - (void)makeCurrentContext;
+- (void)closeWindow; // 添加的关闭窗口的方法
 
 @end
 
@@ -78,6 +79,12 @@
   [context_ makeCurrentContext];
 }
 
+- (void)closeWindow {
+  [window_ performSelectorOnMainThread:@selector(close)
+                            withObject:nil
+                         waitUntilDone:YES];
+}
+
 @end
 
 namespace webrtc {
@@ -98,7 +105,8 @@ MacRenderer::MacRenderer()
     : window_(NULL) {}
 
 MacRenderer::~MacRenderer() {
-  GlRenderer::Destroy();
+  [window_ closeWindow];
+  // GlRenderer::Destroy();
 }
 
 bool MacRenderer::Init(const char* window_title, int width, int height) {
@@ -122,6 +130,10 @@ void MacRenderer::OnFrame(const VideoFrame& frame) {
   [window_ makeCurrentContext];
   GlRenderer::OnFrame(frame);
 }
+
+// void MacRenderer::StopRendering() { // 正确定义StopRendering方法
+//   [window_ closeWindow];
+// }
 
 }  // test
 }  // webrtc
