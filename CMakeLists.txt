@@ -6,8 +6,10 @@ if(WIN32)
     add_definitions(-DWEBRTC_WIN)
 elseif(APPLE)
     add_definitions(-DWEBRTC_MAC -DWEBRTC_POSIX)
+    set(OPENSSL_INCLUDE_DIR "/opt/homebrew/Cellar/openssl@3/3.2.1/include/")
 elseif(UNIX)
     add_definitions(-DWEBRTC_POSIX)
+    set(OPENSSL_INCLUDE_DIR "/usr/include/openssl")
 endif()
 
 # Set version number.
@@ -24,7 +26,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 
 set(LIBWEBRTC_INCLUDE_PATH "${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/")
 set(LIBWEBRTC_BINARY_PATH "${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/")
-set(OPENSSL_INCLUDE_DIR "/opt/homebrew/Cellar/openssl@3/3.2.1/include/")
 set(CMAKE_USE_OPENSSL ON)
 
 # Add some compile flags to our source files.
@@ -122,5 +123,67 @@ include_directories("${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/sdk/objc/base")
 include_directories("${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/")
 include_directories("${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/googletest/src/googletest/include")
 
+
+
+if(APPLE)
+  # 添加 apple 相关 framework
+  find_library(CORE_FOUNDATION_FRAMEWORK CoreFoundation)                                         # 链接 Core Foundation 框架å
+  # 添加 apple 相关 framework
+  find_library(APPKIT_FRAMEWORK AppKit)
+  find_library(VIDEO_TOOLBOX VideoToolbox)
+  find_library(AUDIO_TOOLBOX AudioToolbox)
+  find_library(SECURITY_LIBRARY Security)
+  find_library(METALKIT_LIBRARY MetalKit)
+  find_library(METAL_LIBRARY Metal)
+  find_library(AUDIO_UNIT_LIBRARY AudioUnit)
+  find_library(QUARTZ_CORE_LIBRARY QuartzCore)
+  find_library(ICUCORE_LIBRARY icucore)
+  find_package(OpenGL REQUIRED)
+	find_library(APPLICATION_SERVICES ApplicationServices)
+
+	find_library(AV_FOUNDATION AVFoundation)
+	find_library(CORE_AUDIO CoreAudio)
+	find_library(CORE_FOUNDATION Foundation)
+	find_library(CORE_MEDIA CoreMedia)
+	find_library(CORE_VIDEO CoreVideo)
+	find_library(CORE_SERVICES CoreServices)
+
+  file(GLOB AppleSDK
+    ${CORE_MEDIA_FRAMEWORK} 
+    ${APPKIT_FRAMEWORK}
+    ${VIDEO_TOOLBOX}
+    ${AUDIO_TOOLBOX}
+    ${SECURITY_LIBRARY}
+    ${METALKIT_LIBRARY} 
+    ${METAL_LIBRARY} 
+    ${AUDIO_UNIT_LIBRARY}
+    ${QUARTZ_CORE_LIBRARY}
+    ${ICUCORE_LIBRARY}
+    ${OPENGL_LIBRARIES}
+    ${APPLICATION_SERVICES}
+    ${AV_FOUNDATION}
+    ${CORE_AUDIO}
+    ${CORE_FOUNDATION}
+    ${CORE_MEDIA}
+    ${CORE_VIDEO}
+    ${CORE_SERVICES}
+  )
+  set(AppleSDK ${AppleSDK} CACHE INTERNAL "List of WebRTC SDK Libraries")
+elseif(UNIX)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/jsoncpp/source ${CMAKE_BINARY_DIR}/jsoncpp_build)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/abseil-cpp ${CMAKE_BINARY_DIR}/abseil_build)
+
+    link_directories("${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++")
+    link_directories("${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++abi")
+    # 查找 libc++ 和 libc++abi 的对象文件
+    include_directories("${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++/libc++")
+    include_directories("${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++abi/libc++abi")
+    file(GLOB LIBCXX_OBJECTS "${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++/libc++/*.o")
+    file(GLOB LIBCXXABI_OBJECTS "${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++abi/libc++abi/*.o")
+
+    message(STATUS "LIBCXX_OBJECTS library: ${LIBCXX_OBJECTS}")
+    message(STATUS "LIBCXXABI_OBJECTS library: ${LIBCXXABI_OBJECTS}")
+    message(STATUS "LIBWEBRTC_BINARY_PATH library: ${LIBWEBRTC_BINARY_PATH}")
+endif()
 
 add_subdirectory(demo/mac)

@@ -20,36 +20,86 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	"${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/sdk/objc/base/"
 )
 
-# Public (interface) dependencies.
-target_link_libraries(${PROJECT_NAME} PUBLIC
-	${LIBWEBRTC_BINARY_PATH}/libwebrtc${CMAKE_STATIC_LIBRARY_SUFFIX}
-	${WebrtcSDK}
+set(system_libs)
+if(WIN32)
+    list(APPEND system_libs
+        msvcprt.lib
+        winmm.lib
+        ws2_32.lib
+        secur32.lib
+        crypt32.lib
+        crypt32.lib
+        iphlpapi.lib
+    )
+elseif(APPLE)
+	list(APPEND system_libs
+		${AppleSDK}
+	)
+elseif(UNIX)
+	find_package(OpenSSL REQUIRED)
+	# find_package(absl REQUIRED)
+	# list(APPEND system_libs
+	# 	OpenSSL::SSL
+	# 	OpenSSL::Crypto
+	# 	absl::strings
+	# 	absl::string_view
+	# 	absl::base
+	# 	absl::flags           # 注释，则报 很多 找不到 absl::flags_internal
+	# 	absl::flags_parse     # absl 和 WEBRTC_LIB 都打开，则报 重复定义 absl::raw_log_internal
+	# 	# ${CMAKE_BINARY_DIR}/webrtc/obj/third_party/abseil-cpp/absl/strings/string_view/string_view.o
+	# 	${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/api/librtp_parameters.a
+	# )
 
+	list(APPEND system_libs
+		# ${CMAKE_BINARY_DIR}/webrtc/obj/third_party/boringssl/libboringssl.a
+		# ${CMAKE_SOURCE_DIR}/sdk/hxProtocol/third_party/openssl/prebuild/linux/x86_64/libcrypto.a
+		# ${CMAKE_SOURCE_DIR}/sdk/hxProtocol/third_party/openssl/prebuild/linux/x86_64/libssl.a
+		absl::strings
+		# absl::string_view
+		absl::base
+		absl::flags           # 注释，则报 很多 找不到 absl::flags_internal
+		absl::flags_parse     # absl 和 WEBRTC_LIB 都打开，则报 重复定义 absl::raw_log_internal
+		# ${CMAKE_BINARY_DIR}/webrtc/obj/third_party/abseil-cpp/absl/strings/string_view/string_view.o
+		# eXosip2
+		# osip2
+		# osipparser2
+		${OSIP2_LIB} 
+		${EXOSIP2_LIB}
+		${OSIPPARSER2_LIB}
+		# ${CMAKE_BINARY_DIR}/webrtc/obj/api/librtp_parameters.a
+		# -lc++				# 不是 -lstdc++， 原因：链接 libc++，而不是 libstdc++：
+		# -lc++abi
+		-lssl
+		-lcrypto
+		${CMAKE_BINARY_DIR}/lib/libjsoncpp-d.a
+		-lGL         # OpenGL 库
+		-lX11        # X11 库（GLX 依赖 X11）
+		${GLIB_LIBRARIES}
+		${GTK3_LIBRARIES}
+		resolv
+		pthread
+		cpr
+	)
+endif()
+
+target_link_libraries(${PROJECT_NAME}
+	${WebrtcSDK}
 	${RTC_BASE_LIBS}
 	${WEBRTC_LIB}
 	cpr
 	mediasoupclient
 	webrtc_broadcaster
+	# ${libhxprotocol}
+	# ${libhxprotocol_libz}
+	${LIBCXX_OBJECTS} 
+  	${LIBCXXABI_OBJECTS}
+	${system_libs}
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-	${APPLICATION_SERVICES}
-	${AUDIO_TOOLBOX}
-	${AV_FOUNDATION}
-	${CORE_AUDIO}
-	${CORE_FOUNDATION}
-	${CORE_MEDIA}
-	${CORE_VIDEO}
-	${CORE_SERVICES}
-
-	${APPKIT_FRAMEWORK} 
-	${CORE_MEDIA_FRAMEWORK} 
-	${VIDEO_TOOLBOX_FRAMEWORK}
-	${QUARTZ_CORE_LIBRARY}
-	${ICUCORE_LIBRARY}
-	${METAL_LIBRARY} 
-	${METALKIT_LIBRARY} 
-	${SECURITY_LIBRARY}
-	${AUDIO_UNIT_LIBRARY}
-	${OPENGL_LIBRARIES}
-)
+if(WIN32)
+elseif(APPLE)
+elseif(UNIX)
+	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,--allow-multiple-definition") 
+	target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations)
+	set_target_properties(${PROJECT_NAME} PROPERTIES TESTONLY TRUE)
+endif()
