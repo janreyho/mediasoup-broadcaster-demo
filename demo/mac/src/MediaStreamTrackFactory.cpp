@@ -187,6 +187,7 @@ rtc::scoped_refptr<webrtc::VideoTrackInterface> createVideoTrack(const std::stri
 	return factory->CreateVideoTrack(rtc::CreateRandomUuid(), videoTrackSource);
 }
 
+#if defined(WEBRTC_MAC)
 class CapturerTrackSource : public webrtc::VideoTrackSource {
  public:
   static rtc::scoped_refptr<CapturerTrackSource> Create() {
@@ -222,7 +223,42 @@ class CapturerTrackSource : public webrtc::VideoTrackSource {
   }
   std::unique_ptr<webrtc::test::MacCapturer> capturer_;
 };
+#else
 
+class CapturerTrackSource : public webrtc::VideoTrackSource {
+	public:
+		static rtc::scoped_refptr<CapturerTrackSource> Create() {
+			const size_t kWidth = 640;
+			const size_t kHeight = 480;
+			const size_t kFps = 30;
+			std::unique_ptr<webrtc::test::VcmCapturer> capturer;
+			std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> info( webrtc::VideoCaptureFactory::CreateDeviceInfo());   // 获取所有的视频捕获设备的信息
+			if (!info) {
+				return nullptr;
+			}
+			int num_devices = info->NumberOfDevices();
+				for (int i = 0; i < num_devices; ++i) {
+				capturer = absl::WrapUnique(webrtc::test::VcmCapturer::Create(kWidth, kHeight, kFps, i));  // 创建一个VcmCapturer， VcmCapturer 继承了VideoSinkInterface
+				if (capturer) {
+					return rtc::make_ref_counted<CapturerTrackSource>(std::move(capturer));  // // 使用 VcmCapturer 创建一个CapturerTrackSource
+				}
+			}
+
+			return nullptr;
+		}
+
+ 	std::unique_ptr<webrtc::test::VcmCapturer> capturer_;
+	protected:
+		explicit CapturerTrackSource( std::unique_ptr<webrtc::test::VcmCapturer> capturer)
+				: VideoTrackSource(/*remote=*/false), capturer_(std::move(capturer)) {}
+
+	private:
+		rtc::VideoSourceInterface<webrtc::VideoFrame>* source() override {    // 提供源
+			return capturer_.get();
+		}
+};
+
+#endif
 
 
 namespace webrtc {
@@ -236,7 +272,11 @@ void Loopback() {     // 可以采集渲染成功
     hjy_video_capture = test::CreateVideoCapturer(640, 480, 15, 0);
 	// video_track_ = factory->CreateVideoTrack(hjy_video_capture, "hejiayi"));
 
+#if defined(WEBRTC_MAC)
 	std::unique_ptr<webrtc::test::MacCapturer> capturer = absl::WrapUnique(webrtc::test::MacCapturer::Create(640, 480, 15, 0));
+#else
+	std::unique_ptr<webrtc::test::VcmCapturer> capturer = absl::WrapUnique(webrtc::test::VcmCapturer::Create(640, 480, 15, 0));
+#endif
 	video_device = rtc::make_ref_counted<CapturerTrackSource>(std::move(capturer));
 	// video_track_ = factory->CreateVideoTrack(video_device, "hejiayi");
 
