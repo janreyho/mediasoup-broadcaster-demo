@@ -35,6 +35,7 @@ elseif(UNIX)
 		${hxrtc_src}/common_video/video_frame_buffer.cc
 		${hxrtc_src}/rtc_base/task_queue.cc
 		${hxrtc_src}/api/units/time_delta.cc
+		${hxrtc_src}/rtc_base/internal/default_socket_server.cc
 
 		${hxrtc_src}/api/rtp_parameters.cc
 	    ${hxrtc_src}/api/jsep.cc
@@ -106,6 +107,7 @@ add_executable(${PROJECT_NAME}
 	src/main.cpp
 	src/MediaStreamTrackFactory.cpp
 	${SOURCE_FILES}
+	# ${LIBCXX_SOURCES}
 )
 
 add_dependencies(${PROJECT_NAME} find_webrtc_libs1)
@@ -153,6 +155,8 @@ elseif(UNIX)
 		-lssl
 		-lcrypto
 		${CMAKE_BINARY_DIR}/lib/libjsoncpp-d.a
+		# /usr/lib/llvm-10/lib/libc++.a
+		# /usr/lib/llvm-10/lib/libc++abi.a
 		-lGL         # OpenGL 库
 		-lX11        # X11 库（GLX 依赖 X11）
 		${GLIB_LIBRARIES}

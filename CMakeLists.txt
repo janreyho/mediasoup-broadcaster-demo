@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.8)
 
 project(hxSDK LANGUAGES CXX)
 
+set(hxrtc_src ${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src)
+set(hxrtc_obj ${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj)
+
 if(WIN32)
     add_definitions(-DWEBRTC_WIN)
 elseif(APPLE)
@@ -21,7 +24,25 @@ else()
     set(lib_obj ".o")
     set(lib_lib ".a")
     set(lib_webrtc "libwebrtc.a")
-    set(GN_COMMAND "--args=\"${gn_args}\"")
+    # set(CMAKE_C_COMPILER "/usr/bin/clang" CACHE PATH "WebRTC clang" FORCE)
+    # set(CMAKE_CXX_COMPILER "/usr/bin/clang++" CACHE PATH "WebRTC clang++" FORCE)
+ 
+    # set(CMAKE_C_COMPILER "${hxrtc_src}/third_party/llvm-build/Release+Asserts/bin/clang" CACHE PATH "WebRTC clang" FORCE)
+    # set(CMAKE_CXX_COMPILER "${hxrtc_src}/third_party/llvm-build/Release+Asserts/bin/clang++" CACHE PATH "WebRTC clang++" FORCE)
+    # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
+    # set(GN_COMMAND "--args=\"${gn_args}\"")
+    # set(OPENGL_gl_LIBRARY "/usr/lib/x86_64-linux-gnu/libGL.so")
+    # set(OPENGL_glx_LIBRARY "/usr/lib/x86_64-linux-gnu/libGLX.so")
+    # 关闭相对路径优化
+    # target_compile_options(your_target PRIVATE -fno-dwarf2-cfi-asm -fno-debug-types-section)
+    # # 关闭 Split DWARF（若无需优化）
+    # set(CMAKE_DEBUG_SPLIT OFF)  # 或 set(USE_DEBUG_FISSION FALSE)
+
+    # set(LIBCXX_SOURCE_DIR "${hxrtc_src}/third_party/libc++/src")
+    # set(LIBCXX_BINARY_DIR "${hxrtc_obj}/buildtools/third_party/libc++/libc++")
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fno-lto")   # 禁用 DWO 调试信息优化
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-lto")
 endif()
 
 # Set version number.
@@ -69,8 +90,6 @@ if(APPLE)
 	find_library(CORE_SERVICES CoreServices)
 endif(APPLE)
 
-set(hxrtc_src ${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src)
-set(hxrtc_obj ${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj)
 # 生成一个查找库的脚本
 file(WRITE ${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs1.cmake "
     # find_library(WEBRTC_LIB NAMES webrtc PATHS "${hxrtc_obj}" NO_DEFAULT_PATH)
@@ -215,14 +234,19 @@ if(APPLE)
 elseif(UNIX)
     add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/jsoncpp/source ${CMAKE_BINARY_DIR}/jsoncpp_build)
     add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/abseil-cpp ${CMAKE_BINARY_DIR}/abseil_build)
+    # add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/libc++/src ${CMAKE_BINARY_DIR}/libc++)
+    # add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/libc++abi/src ${CMAKE_BINARY_DIR}/libc++abi)
 
-    link_directories("${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++")
-    link_directories("${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++abi")
-    # 查找 libc++ 和 libc++abi 的对象文件
-    include_directories("${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++/libc++")
-    include_directories("${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++abi/libc++abi")
-    file(GLOB LIBCXX_OBJECTS "${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++/libc++/*.o")
-    file(GLOB LIBCXXABI_OBJECTS "${LIBWEBRTC_BINARY_PATH}/buildtools/third_party/libc++abi/libc++abi/*.o")
+    # link_directories("${hxrtc_obj}/buildtools/third_party/libc++")
+    # link_directories("${hxrtc_obj}/buildtools/third_party/libc++abi")
+    # # 查找 libc++ 和 libc++abi 的对象文件
+    # include_directories("${hxrtc_src}/buildtools/third_party/libc++/libc++")
+    # include_directories("${hxrtc_src}/buildtools/third_party/libc++abi/libc++abi")
+    file(GLOB LIBCXX_OBJECTS
+        "${hxrtc_obj}/buildtools/third_party/libc++/libc++/*.o"
+        "${hxrtc_obj}/buildtools/third_party/libc++/libc++/*.dwo"
+    )
+    file(GLOB LIBCXXABI_OBJECTS "${hxrtc_obj}/buildtools/third_party/libc++abi/libc++abi/*.o")
 
     message(STATUS "LIBCXX_OBJECTS library: ${LIBCXX_OBJECTS}")
     message(STATUS "LIBCXXABI_OBJECTS library: ${LIBCXXABI_OBJECTS}")
