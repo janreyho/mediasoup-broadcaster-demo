@@ -146,6 +146,7 @@ int main(int /*argc*/, char* /*argv*/[])
 			rtc::LogMessage::LogToDebug(rtc::LoggingSeverity::LS_ERROR);
 	}
 
+	rtc::LogMessage::LogToDebug(rtc::LoggingSeverity::LS_Network);
 	auto logLevel = mediasoupclient::Logger::LogLevel::LOG_DEBUG;
 	mediasoupclient::Logger::SetLogLevel(logLevel);
 	mediasoupclient::Logger::SetDefaultHandler();

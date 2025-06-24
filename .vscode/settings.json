@@ -75,6 +75,7 @@
         "valarray": "cpp",
         "vector": "cpp",
         "algorithm": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "memory": "cpp"
     }
 }

@@ -193,7 +193,6 @@ target_link_libraries(peerconnection_client
     # Threads::Threads           # 添加 pthread 库
     # -lpthread
     # ssl crypto
-    ${libs_peerconnection_client}
     ${CMAKE_DL_LIBS}  # 自动链接 libdl
 
     # absl::flags_internal  # 打开 也报 重复定义 absl::raw_log_internal     下面均无法解决 absl 报错

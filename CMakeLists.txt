@@ -43,6 +43,8 @@ else()
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fno-lto")   # 禁用 DWO 调试信息优化
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-lto")
+    # add_compile_options(-gno-split-dwarf)  # Clang/GCC 禁用分离调试
+    # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -gno-split-dwarf")
 endif()
 
 # Set version number.
@@ -90,80 +92,6 @@ if(APPLE)
 	find_library(CORE_SERVICES CoreServices)
 endif(APPLE)
 
-# 生成一个查找库的脚本
-file(WRITE ${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs1.cmake "
-    # find_library(WEBRTC_LIB NAMES webrtc PATHS "${hxrtc_obj}" NO_DEFAULT_PATH)
-    file(GLOB WEBRTC_LIB \"${hxrtc_obj}/${lib_webrtc}\")
-    if(WEBRTC_LIB)
-        message(STATUS \"Found WEBRTC_LIB library: ${WEBRTC_LIB}\")
-    endif()
-
-    file(GLOB BORINGSSL_LIB \"${hxrtc_obj}/third_party/boringssl/libboringssl${lib_lib}\")
-    if(BORINGSSL_LIB)
-        message(STATUS \"Found BORINGSSL_LIB library: ${BORINGSSL_LIB}\")
-    endif()
-")
-
-# 创建一个 CMake 脚本，用于查找已编译的库
-file(WRITE ${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs2.cmake "
-    file(GLOB RTC_BASE_LIBS \"${hxrtc_obj}/rtc_base/*${lib_lib}\")
-    if(RTC_BASE_LIBS)
-        message(STATUS \"RTC_BASE_LIBS library: \${RTC_BASE_LIBS}\")
-        set(RTC_BASE_LIBS \${RTC_BASE_LIBS} PARENT_SCOPE)
-    endif()
-
-    file(GLOB WebrtcSDK
-    \"${hxrtc_obj}/sdk/libvideoframebuffer_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libvideocapture_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libvideocodec_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libnative_api${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libnative_video${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libdefault_codec_factory_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libaom_av1_encoder${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libvp8${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libvp9${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libfile_logger_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libmediasource_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libdav1d_decoder${lib_lib}\"
-    \"${hxrtc_obj}/modules/video_coding/codecs/av1/libdav1d_decoder${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libvideotoolbox_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libvideorendereradapter_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libvideosource_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libwrapped_native_codec_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libmediaconstraints_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libaudio_device_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libbase_native_additions_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libcallback_logger_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libmedia_constraints${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libobjc_audio_device_module${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libvideo_toolbox_cc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libvpx_codec_constants${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libmetal_objc${lib_lib}\"
-    \"${hxrtc_obj}/sdk/libpeerconnectionfactory_base_objc${lib_lib}\"
-    \"${hxrtc_obj}/api/librtc_event_log_output_file${lib_lib}\"
-    )
-    # 使变量在整个项目中可用
-    if(WebrtcSDK)
-        set(WebrtcSDK \${WebrtcSDK} CACHE INTERNAL \"List of WebRTC SDK Libraries\")
-    endif()
-  ")
-# 添加一个目标来执行查找库文件的脚本
-add_custom_target(
-    find_webrtc_libs2 ALL
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs2.cmake
-    # DEPENDS build_webrtc
-    COMMENT "Finding WebRTC libraries"
-)
-add_custom_target(
-    find_webrtc_libs1 ALL
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs1.cmake
-    # DEPENDS build_webrtc
-    COMMENT "Finding WebRTC libraries"
-)
-
-# 使变量在整个项目中可用
-set(WebrtcSDK ${WebrtcSDK} CACHE INTERNAL "List of WebRTC SDK Libraries")
-
 # 链接 WebRTC 库
 find_library(WEBRTC_LIB NAMES webrtc PATHS "${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj" NO_DEFAULT_PATH)
 file(GLOB RTC_BASE_LIBS "${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/rtc_base/*.a") # 遍历 rtc_base 所有库文件
@@ -173,6 +101,7 @@ file(GLOB RTC_BASE_LIBS "${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/
 # Source Dependencies.
 add_subdirectory(sdk/libwebrtc "${CMAKE_CURRENT_BINARY_DIR}/libwebrtc")
 add_subdirectory(sdk/libmediasoupclient "${CMAKE_CURRENT_BINARY_DIR}/libmediasoupclient")
+set(BUILD_CPR_TESTS OFF)
 add_subdirectory(sdk/cpr "${CMAKE_CURRENT_BINARY_DIR}/cpr")
 
 
@@ -233,7 +162,6 @@ if(APPLE)
   set(AppleSDK ${AppleSDK} CACHE INTERNAL "List of WebRTC SDK Libraries")
 elseif(UNIX)
     add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/jsoncpp/source ${CMAKE_BINARY_DIR}/jsoncpp_build)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/abseil-cpp ${CMAKE_BINARY_DIR}/abseil_build)
     # add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/libc++/src ${CMAKE_BINARY_DIR}/libc++)
     # add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/third_party/libc++abi/src ${CMAKE_BINARY_DIR}/libc++abi)
 
@@ -242,15 +170,11 @@ elseif(UNIX)
     # # 查找 libc++ 和 libc++abi 的对象文件
     # include_directories("${hxrtc_src}/buildtools/third_party/libc++/libc++")
     # include_directories("${hxrtc_src}/buildtools/third_party/libc++abi/libc++abi")
-    file(GLOB LIBCXX_OBJECTS
-        "${hxrtc_obj}/buildtools/third_party/libc++/libc++/*.o"
-        "${hxrtc_obj}/buildtools/third_party/libc++/libc++/*.dwo"
-    )
-    file(GLOB LIBCXXABI_OBJECTS "${hxrtc_obj}/buildtools/third_party/libc++abi/libc++abi/*.o")
 
     message(STATUS "LIBCXX_OBJECTS library: ${LIBCXX_OBJECTS}")
     message(STATUS "LIBCXXABI_OBJECTS library: ${LIBCXXABI_OBJECTS}")
     message(STATUS "LIBWEBRTC_BINARY_PATH library: ${LIBWEBRTC_BINARY_PATH}")
 endif()
 
+add_subdirectory(examples)
 add_subdirectory(demo/mac)

@@ -19,8 +19,6 @@ message(STATUS "------ PeerConnectionServer")
 include_directories(${hxrtc_src})
 # include("${hxrtc_src}/third_party/abseil-cpp/install/lib/cmake/absl/abslConfig.cmake")
 
-include(${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs1.cmake)
-include(${CMAKE_BINARY_DIR}/webrtc/find_webrtc_libs2.cmake)
 message(STATUS "RTC_BASE_LIBS library: ${RTC_BASE_LIBS}")
 
 
