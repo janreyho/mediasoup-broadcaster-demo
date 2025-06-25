@@ -77,6 +77,7 @@ elseif(UNIX)
 		# /usr/lib/llvm-10/lib/libc++abi.a
 		-lGL         # OpenGL 库
 		-lX11        # X11 库（GLX 依赖 X11）
+		${CMAKE_DL_LIBS}  # 自动链接 libdl
 		${GLIB_LIBRARIES}
 		${GTK3_LIBRARIES}
 		# ${hxrtc_obj}/stats/librtc_stats.a  # 不生效?

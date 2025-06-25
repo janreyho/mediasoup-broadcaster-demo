@@ -12,7 +12,7 @@ elseif(APPLE)
     set(OPENSSL_INCLUDE_DIR "/opt/homebrew/Cellar/openssl@3/3.2.1/include/")
 elseif(UNIX)
     add_definitions(-DWEBRTC_POSIX)
-    set(OPENSSL_INCLUDE_DIR "/usr/include/openssl")
+    set(OPENSSL_INCLUDE_DIR "/usr/local/include/openssl")
 endif()
 
 if(WIN32)
@@ -101,6 +101,7 @@ file(GLOB RTC_BASE_LIBS "${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/
 # Source Dependencies.
 add_subdirectory(sdk/libwebrtc "${CMAKE_CURRENT_BINARY_DIR}/libwebrtc")
 add_subdirectory(sdk/libmediasoupclient "${CMAKE_CURRENT_BINARY_DIR}/libmediasoupclient")
+find_package(CURL)        # 关闭后无法访问李涛高限制的https地址，打开后libcurl、libz都需要用系统的
 set(BUILD_CPR_TESTS OFF)
 add_subdirectory(sdk/cpr "${CMAKE_CURRENT_BINARY_DIR}/cpr")
 
