@@ -105,7 +105,7 @@ target_link_libraries(${PROJECT_NAME}
 if(WIN32)
 elseif(APPLE)
 elseif(UNIX)
-	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,--allow-multiple-definition") 
+	# set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,--allow-multiple-definition") 
 	target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations)
 	set_target_properties(${PROJECT_NAME} PROPERTIES TESTONLY TRUE)
 endif()

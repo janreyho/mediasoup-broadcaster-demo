@@ -7,26 +7,16 @@ set(hxrtc_obj ${CMAKE_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj)
 
 if(WIN32)
     add_definitions(-DWEBRTC_WIN)
-elseif(APPLE)
-    add_definitions(-DWEBRTC_MAC -DWEBRTC_POSIX)
-    set(OPENSSL_INCLUDE_DIR "/opt/homebrew/Cellar/openssl@3/3.2.1/include/")
-elseif(UNIX)
-    add_definitions(-DWEBRTC_POSIX)
-    set(OPENSSL_INCLUDE_DIR "/usr/include/openssl")
-endif()
-
-if(WIN32)
     set(lib_obj ".obj")
     set(lib_lib ".lib")
     set(lib_webrtc "webrtc.lib")
     set(GN_COMMAND "--ide=vs2022 --args=\"${gn_args}\"")
-else()
-    set(lib_obj ".o")
-    set(lib_lib ".a")
-    set(lib_webrtc "libwebrtc.a")
-    # set(CMAKE_C_COMPILER "/usr/bin/clang" CACHE PATH "WebRTC clang" FORCE)
-    # set(CMAKE_CXX_COMPILER "/usr/bin/clang++" CACHE PATH "WebRTC clang++" FORCE)
- 
+elseif(APPLE)
+    add_definitions(-DWEBRTC_MAC -DWEBRTC_POSIX)
+    set(OPENSSL_INCLUDE_DIR "/opt/homebrew/Cellar/openssl@3/3.4.1/include/")
+elseif(UNIX)
+    add_definitions(-DWEBRTC_POSIX)
+    set(OPENSSL_INCLUDE_DIR "/usr/include/openssl")
     set(CMAKE_C_COMPILER "${hxrtc_src}/third_party/llvm-build/Release+Asserts/bin/clang" CACHE PATH "WebRTC clang" FORCE)
     set(CMAKE_CXX_COMPILER "${hxrtc_src}/third_party/llvm-build/Release+Asserts/bin/clang++" CACHE PATH "WebRTC clang++" FORCE)
     # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
@@ -45,6 +35,14 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-lto")
     # add_compile_options(-gno-split-dwarf)  # Clang/GCC 禁用分离调试
     # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -gno-split-dwarf")
+endif()
+
+if(NOT WIN32)
+    set(lib_obj ".o")
+    set(lib_lib ".a")
+    set(lib_webrtc "libwebrtc.a")
+    # set(CMAKE_C_COMPILER "/usr/bin/clang" CACHE PATH "WebRTC clang" FORCE)
+    # set(CMAKE_CXX_COMPILER "/usr/bin/clang++" CACHE PATH "WebRTC clang++" FORCE)
 endif()
 
 # Set version number.
@@ -159,6 +157,46 @@ if(APPLE)
     ${CORE_MEDIA}
     ${CORE_VIDEO}
     ${CORE_SERVICES}
+
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/WebRTC.framework
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideoframebuffer_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideocapture_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideocodec_objc.a
+    # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libbase_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libnative_api.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libnative_video.a
+
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libdefault_codec_factory_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libaom_av1_encoder.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvp8.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvp9.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libfile_logger_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libmediasource_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libdav1d_decoder.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/modules/video_coding/codecs/av1/libdav1d_decoder.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideotoolbox_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideorendereradapter_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideosource_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libwrapped_native_codec_objc.a
+
+    # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libhelpers_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libmediaconstraints_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libaudio_device_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libbase_native_additions_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libcallback_logger_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libmedia_constraints.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libobjc_audio_device_module.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvideo_toolbox_cc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libvpx_codec_constants.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libmetal_objc.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/sdk/libpeerconnectionfactory_base_objc.a
+    # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/rtc_base/liblogging.a
+    # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/rtc_base/liblog_sinks.a
+
+    # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/audio/libaudio.a
+    ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/api/librtc_event_log_output_file.a
+    # ${PROJECT_SOURCE_DIR}/thirdparty/hxrtc/src/out/mac/obj/rtc_base/libfile_rotating_stream.a
+	
   )
   set(AppleSDK ${AppleSDK} CACHE INTERNAL "List of WebRTC SDK Libraries")
 elseif(UNIX)
