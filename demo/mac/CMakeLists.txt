@@ -82,7 +82,9 @@ elseif(UNIX)
 		${GTK3_LIBRARIES}
 		# ${hxrtc_obj}/stats/librtc_stats.a  # 不生效?
 		resolv
-		pthread
+		# pthread
+		-lpthread
+		# ${hxrtc_obj}/rtc_base/libthreading.a
 		cpr
 	)
 endif()

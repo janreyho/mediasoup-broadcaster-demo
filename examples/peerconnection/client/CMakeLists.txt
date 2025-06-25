@@ -156,7 +156,7 @@ set(SOURCE_FILES
     ${hxrtc_src}/p2p/base/transport_description.cc
     ${hxrtc_src}/rtc_base/ssl_fingerprint.cc
     ${hxrtc_src}/rtc_base/message_digest.cc
-    ${hxrtc_src}/rtc_base/openssl_digest.cc
+    # ${hxrtc_src}/rtc_base/openssl_digest.cc
 
     ${hxrtc_src}/p2p/base/port.cc
     ${hxrtc_src}/api/transport/stun.cc
@@ -192,7 +192,8 @@ target_link_libraries(peerconnection_client
     X11
     # Threads::Threads           # 添加 pthread 库
     # -lpthread
-    # ssl crypto
+    # -lssl 
+    # -lcrypto
     ${CMAKE_DL_LIBS}  # 自动链接 libdl
 
     # absl::flags_internal  # 打开 也报 重复定义 absl::raw_log_internal     下面均无法解决 absl 报错
