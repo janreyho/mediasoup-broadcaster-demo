@@ -189,7 +189,7 @@ target_link_libraries(peerconnection_client
     absl::flags_parse     # absl 和 WEBRTC_LIB 都打开，则报 重复定义 absl::raw_log_internal
     absl::flags_usage
     absl::strings
-    X11
+    -lX11
     # Threads::Threads           # 添加 pthread 库
     # -lpthread
     # -lssl 

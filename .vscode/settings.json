@@ -76,6 +76,10 @@
         "vector": "cpp",
         "algorithm": "cpp",
         "utility": "cpp",
-        "memory": "cpp"
+        "memory": "cpp",
+        "execution": "cpp",
+        "print": "cpp",
+        "queue": "cpp",
+        "unordered_set": "cpp"
     }
 }

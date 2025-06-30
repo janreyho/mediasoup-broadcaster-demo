@@ -70,8 +70,8 @@ elseif(UNIX)
 		# ${CMAKE_BINARY_DIR}/webrtc/obj/api/librtp_parameters.a
 		# -lc++				# 不是 -lstdc++， 原因：链接 libc++，而不是 libstdc++：
 		# -lc++abi
-		-lssl
-		-lcrypto
+		# -lssl
+		# -lcrypto
 		${CMAKE_BINARY_DIR}/lib/libjsoncpp-d.a
 		# /usr/lib/llvm-10/lib/libc++.a
 		# /usr/lib/llvm-10/lib/libc++abi.a

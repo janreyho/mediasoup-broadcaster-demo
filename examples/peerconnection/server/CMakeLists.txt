@@ -46,7 +46,7 @@ target_link_libraries(peerconnection_server
 
     ${LIBCXX_OBJECTS} 
     ${LIBCXXABI_OBJECTS}
-
+    -lX11
     # ${hxrtc_obj}/api/libfield_trials.a
 #   test_field_trial
 
