@@ -22,7 +22,7 @@ set(SOURCE_FILES
 
 
 if(APPLE)
-		set(SOURCE_FILES ${SOURCE_FILES}
+	set(SOURCE_FILES ${SOURCE_FILES}
 		test/testsupport/ios_file_utils.mm
 		test/testsupport/mac_file_utils.mm
         test/mac/hx_runder.mm
@@ -38,6 +38,10 @@ elseif(WIN32)
 elseif(UNIX)
     list(APPEND SOURCE_FILES
         # 添加Linux特定的源文件
+		test/linux/video_renderer_linux.cc
+		test/linux/glx_renderer.cc
+		test/run_test.cc
+	    # rtc_base/synchronization/sequence_checker_internal.cc
         # test/linux/some_linux_file.cc
     )
 endif()

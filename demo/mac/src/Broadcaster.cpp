@@ -571,7 +571,7 @@ void Broadcaster::CreateRecvTransport()
 	  response["dtlsParameters"],
 	  sctpParameters);
 
-	this->CreateDataConsumer();
+	// this->CreateDataConsumer();
 }
 
 void Broadcaster::OnMessage(mediasoupclient::DataConsumer* dataConsumer, const webrtc::DataBuffer& buffer)

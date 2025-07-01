@@ -19,12 +19,6 @@ elseif(UNIX)
 
 	include_directories(${hxrtc_src}/third_party/jsoncpp/source/include/)
 	include_directories(${hxrtc_src}/out/mac/gen)
-	set(SOURCE_FILES
-		${hxrtc_src}/test/linux/video_renderer_linux.cc
-		${hxrtc_src}/test/linux/glx_renderer.cc
-		${hxrtc_src}/test/run_test.cc
-	    ${hxrtc_src}/rtc_base/synchronization/sequence_checker_internal.cc
-	)
 endif()
 
 
@@ -33,7 +27,6 @@ add_executable(${PROJECT_NAME}
 	src/Broadcaster.cpp
 	src/main.cpp
 	src/MediaStreamTrackFactory.cpp
-	${SOURCE_FILES}
 	# ${LIBCXX_SOURCES}
 )
 
@@ -70,8 +63,8 @@ elseif(UNIX)
 		# ${CMAKE_BINARY_DIR}/webrtc/obj/api/librtp_parameters.a
 		# -lc++				# 不是 -lstdc++， 原因：链接 libc++，而不是 libstdc++：
 		# -lc++abi
-		# -lssl
-		# -lcrypto
+		-lssl
+		-lcrypto
 		${CMAKE_BINARY_DIR}/lib/libjsoncpp-d.a
 		# /usr/lib/llvm-10/lib/libc++.a
 		# /usr/lib/llvm-10/lib/libc++abi.a

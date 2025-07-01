@@ -263,13 +263,13 @@ class CapturerTrackSource : public webrtc::VideoTrackSource {
 
 namespace webrtc {
 
-std::unique_ptr<test::TestVideoCapturer> hjy_video_capture;
+// std::unique_ptr<test::TestVideoCapturer> hjy_video_capture;
 rtc::scoped_refptr<CapturerTrackSource>  video_device;
 rtc::scoped_refptr<webrtc::VideoTrackInterface> video_track_;
 void Loopback() {     // 可以采集渲染成功
     RTC_LOG(LS_INFO) << __FUNCTION__;
 
-    hjy_video_capture = test::CreateVideoCapturer(640, 480, 15, 0);
+    // hjy_video_capture = test::CreateVideoCapturer(640, 480, 15, 0);
 	// video_track_ = factory->CreateVideoTrack(hjy_video_capture, "hejiayi"));
 
 #if defined(WEBRTC_MAC)
