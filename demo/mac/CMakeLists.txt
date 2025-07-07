@@ -68,8 +68,8 @@ elseif(UNIX)
 		${CMAKE_BINARY_DIR}/lib/libjsoncpp-d.a
 		# /usr/lib/llvm-10/lib/libc++.a
 		# /usr/lib/llvm-10/lib/libc++abi.a
-		-lGL         # OpenGL 库
-		-lX11        # X11 库（GLX 依赖 X11）
+		# -lGL         # OpenGL 库
+		# -lX11        # X11 库（GLX 依赖 X11）
 		${CMAKE_DL_LIBS}  # 自动链接 libdl
 		${GLIB_LIBRARIES}
 		${GTK3_LIBRARIES}
