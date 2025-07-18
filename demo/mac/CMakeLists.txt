@@ -21,12 +21,13 @@ elseif(UNIX)
 	include_directories(${hxrtc_src}/out/mac/gen)
 endif()
 
-
+add_definitions(-DPROJECT_ROOT="${CMAKE_SOURCE_DIR}")
 # Create target.
 add_executable(${PROJECT_NAME}
 	src/Broadcaster.cpp
 	src/main.cpp
 	src/MediaStreamTrackFactory.cpp
+	src/hx_log.cpp
 	# ${LIBCXX_SOURCES}
 )
 

@@ -7,6 +7,7 @@
 #include <string>
 
 #include <stdio.h>
+#include <hx_log.hpp>
 
 #if defined(WEBRTC_WIN)
 #include <conio.h>
@@ -95,6 +96,9 @@ int main(int /*argc*/, char* /*argv*/[])
 	// webrtc::test::RunTest(webrtc::Loopback22);
 	// Register signal SIGINT and signal handler.
 	signal(SIGINT, signalHandler);
+
+	setLogLevel(HxLog::hxDEBUG, "./log/rtcDemo.asn");
+	LOG_MESSAGE(HxLog::hxINFO, "rtcDemo::main");
 
 	// Retrieve configuration from environment variables.
 	const char* envServerUrl    = std::getenv("SERVER_URL");
